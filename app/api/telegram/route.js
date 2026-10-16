@@ -2,13 +2,15 @@ import { db, rp, wib, summary } from '@/lib/db';
 import { parse } from '@/lib/parse';
 
 const LOW = 50000;
-const LABEL = { income: '💰 Pemasukan', expense: '🛒 Pengeluaran', saving_in: '🐷 Masuk tabungan', saving_out: '🏧 Ambil tabungan' };
+const LABEL = { income: '💰 Pemasukan', expense: '🛒 Pengeluaran', saving_in: '🐷 Masuk tabungan', saving_out: '🏧 Ambil tabungan', transfer: '🔁 Pindah saldo' };
 const HELP = `Ketik transaksi biasa:
 • beli bakso 20k
 • gajian 2jt
 • jual hp 500rb
 • tabung 300k
 • ambil tabungan 100k
+• beli bakso 20k tf (tanpa tf = cash)
+• tarik tunai 200k / setor 200k
 
 Perintah: /saldo /hari /bulan /undo`;
 
@@ -37,7 +39,7 @@ export async function POST(req) {
     if (cmd === '/start' || cmd === '/help') await send(HELP);
     else if (cmd === '/saldo') {
       const s = await summary();
-      await send(`💳 Saldo: ${rp(s.balance)}\n🐷 Tabungan: ${rp(s.saving)}`);
+      await send(`💳 Total: ${rp(s.balance)}\n💵 Cash: ${rp(s.cash)}\n🏦 Bank: ${rp(s.bank)}\n🐷 Tabungan: ${rp(s.saving)}`);
     } else if (cmd === '/hari' || cmd === '/bulan') {
       const w = wib();
       const from = cmd === '/hari' ? w.slice(0, 10) : w.slice(0, 7) + '-01';
@@ -56,14 +58,14 @@ export async function POST(req) {
       if (!tx) await send('Aku gak nemu nominalnya. Contoh: beli bakso 20k\n\n' + HELP);
       else {
         const s = await summary();
-        if ((tx.type === 'expense' || tx.type === 'saving_in') && tx.amount > s.balance)
-          await send(`⛔ Ditolak, saldo gak cukup.\nSaldo: ${rp(s.balance)}, butuh ${rp(tx.amount)}.`);
+        if (tx.type !== 'income' && tx.type !== 'saving_out' && tx.amount > s[tx.wallet])
+          await send(`⛔ Ditolak, saldo ${tx.wallet} gak cukup.\nSaldo ${tx.wallet}: ${rp(s[tx.wallet])}, butuh ${rp(tx.amount)}.`);
         else if (tx.type === 'saving_out' && tx.amount > s.saving)
           await send(`⛔ Tabungan gak cukup. Tabungan: ${rp(s.saving)}.`);
         else {
           await db.from('transactions').insert(tx);
           const s2 = await summary();
-          let r = `${LABEL[tx.type]} ${rp(tx.amount)} (${tx.category})\nSaldo: ${rp(s2.balance)} | Tabungan: ${rp(s2.saving)}`;
+          let r = `${LABEL[tx.type]} ${rp(tx.amount)} (${tx.category}, ${tx.type === 'transfer' ? tx.wallet + ' → ' + tx.to_wallet : tx.wallet})\nTotal: ${rp(s2.balance)}\n💵 ${rp(s2.cash)} | 🏦 ${rp(s2.bank)} | 🐷 ${rp(s2.saving)}`;
           if (s2.balance <= LOW)
             r += `\n\n⚠️ Saldo tinggal ${rp(s2.balance)}! Hemat dulu sampai ada pemasukan lagi.`;
           await send(r);
