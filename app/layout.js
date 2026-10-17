@@ -1,36 +1,44 @@
 export const metadata = { title: 'Catatan Keuangan' };
 
 const css = `
-:root{--ink:#111;--bg:#fff3c4;--y:#ffd93d;--pink:#ff7eb6;--cyan:#5ad1e6;--lime:#9be564;--red:#ff4d4d;color-scheme:light}
+:root{--ink:#0b0b0b;--paper:#f6f3ec;--red:#e3231b;color-scheme:light}
 *{box-sizing:border-box}
-body{margin:0;color:var(--ink);font:700 16px/1.45 'Comic Neue',system-ui,sans-serif;background:var(--bg);background-image:radial-gradient(#0002 1.6px,transparent 1.6px);background-size:14px 14px}
-main{max-width:640px;margin:0 auto;padding:18px 14px 70px}
-h1,h2,.num{font-family:Bangers,Impact,sans-serif;font-weight:400;letter-spacing:1px}
-h1{display:inline-block;font-size:26px;margin:0 0 16px;padding:4px 14px;background:var(--pink);border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);transform:rotate(-2deg)}
-h2{font-size:24px;margin:30px 0 10px}
-.pan{border:3px solid var(--ink);border-radius:12px;box-shadow:6px 6px 0 var(--ink);padding:14px;background:#fff}
-.hero{background:var(--y);background-image:radial-gradient(#0003 1.6px,transparent 1.6px);background-size:10px 10px;padding:18px 16px}
-.hero small{display:block;font-size:15px}
-.hero .num{font-size:clamp(44px,15vw,72px);line-height:1.05;word-break:break-all}
-.hero .num.neg{color:var(--red)}
-.say{position:relative;margin:22px 0 6px;padding:10px 14px;background:#fff;border:3px solid var(--ink);border-radius:16px;font-size:15px}
-.say:before{content:'';position:absolute;top:-16px;left:28px;border:8px solid transparent;border-bottom:8px solid var(--ink);border-top:0;border-width:0 9px 14px}
-.say:after{content:'';position:absolute;top:-9px;left:30px;border:solid transparent;border-width:0 7px 11px;border-bottom-color:#fff}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
-.grid .pan{padding:10px 12px}.grid small{display:block;font-size:14px}.grid .num{font-size:28px}
-.cash{background:var(--lime)}.bank{background:var(--cyan)}.sav{background:var(--pink)}
-.wide{grid-column:1/-1}
-.bar{display:grid;grid-template-columns:78px 1fr 92px;gap:8px;align-items:center;margin:9px 0;font-size:15px}
-.bar i{display:block;height:18px;border:3px solid var(--ink);border-radius:9px;background:var(--red)}
-.tx{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px;padding:10px 12px;box-shadow:4px 4px 0 var(--ink)}
-.tx b{display:block}.m{font-size:13px;font-weight:700;opacity:.7}
-.tag{display:inline-block;padding:0 7px;margin-right:4px;border:2px solid var(--ink);border-radius:8px;font-size:12px;background:var(--y)}
-.amt{text-align:right;white-space:nowrap;font-family:Bangers,Impact,sans-serif;font-size:22px;letter-spacing:.5px}
-.in{color:#0b7a3b}.out{color:#d12a2a}.sv{color:#2447b3}
-input,button{font:inherit;padding:11px 12px;border:3px solid var(--ink);border-radius:10px;background:#fff;color:var(--ink)}
-button{background:var(--pink);box-shadow:4px 4px 0 var(--ink);cursor:pointer}
-button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
-:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+body{margin:0;color:var(--ink);font:500 16px/1.45 'Zen Kaku Gothic New',system-ui,sans-serif;background:var(--paper);background-image:radial-gradient(#0000001c 1px,transparent 1.2px);background-size:6px 6px}
+main{max-width:680px;margin:0 auto;padding:20px 14px 80px}
+.disp,h1,h2{font-family:'Dela Gothic One','Zen Kaku Gothic New',sans-serif;font-weight:400}
+.ch{display:inline-block;font-weight:900;font-size:12px;letter-spacing:2px;text-transform:uppercase;border:3px solid var(--ink);padding:1px 8px;background:var(--ink);color:var(--paper)}
+h1{font-size:clamp(28px,9vw,44px);line-height:1;margin:8px 0 18px;letter-spacing:-1px}
+h2{display:inline-block;font-size:15px;margin:34px 0 12px;padding:5px 14px;background:var(--ink);color:var(--paper);transform:skewX(-8deg)}
+.panels{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.p{position:relative;border:4px solid var(--ink);background:var(--paper);padding:12px 14px;overflow:hidden}
+.s3{grid-column:span 3}.s6{grid-column:span 6}
+.p small{display:block;font-weight:900;font-size:12px;letter-spacing:1.5px;text-transform:uppercase}
+.p .disp{font-size:clamp(22px,6.4vw,32px);line-height:1.15;word-break:break-all}
+.hero{padding:20px 16px 22px;background-image:repeating-conic-gradient(from 0deg at 62% 50%,transparent 0 4deg,#0000001f 4deg 5deg)}
+.hero .disp{font-size:clamp(40px,13vw,68px);line-height:1.05}
+.neg{color:var(--red)}
+.sfx{position:absolute;top:8px;right:10px;font-family:'Dela Gothic One',sans-serif;font-size:22px;color:var(--red);transform:rotate(9deg);-webkit-text-stroke:1.5px var(--ink);paint-order:stroke fill;text-shadow:2px 2px 0 var(--ink)}
+.hatch{background-image:repeating-linear-gradient(45deg,transparent 0 6px,#0000001a 6px 7px)}
+.say{position:relative;margin:24px 4px 4px;padding:10px 14px;background:#fff;border:3px solid var(--ink);border-radius:18px;font-weight:700;font-size:15px}
+.say b{font-family:'Dela Gothic One',sans-serif;font-weight:400;color:var(--red);margin-right:6px}
+.say:before,.say:after{content:'';position:absolute;left:30px;border-style:solid;border-color:transparent}
+.say:before{top:-16px;border-width:0 10px 16px;border-bottom-color:var(--ink)}
+.say:after{top:-10px;margin-left:2px;border-width:0 8px 12px;border-bottom-color:#fff}
+.bar{display:grid;grid-template-columns:76px 1fr 96px;gap:8px;align-items:center;margin:10px 0;font-weight:700;font-size:15px}
+.bar i{display:block;height:20px;border:3px solid var(--ink);background:repeating-linear-gradient(135deg,var(--ink) 0 2px,transparent 2px 6px)}
+.bar:first-of-type i{background:var(--red)}
+.tx{display:grid;grid-template-columns:54px 1fr auto;gap:12px;align-items:center;border:3px solid var(--ink);background:var(--paper);padding:9px 12px;margin-bottom:-3px}
+.tx time{font-weight:900;font-size:12px;line-height:1.2;text-align:center;border-right:3px solid var(--ink);padding-right:10px}
+.tx b{display:block;font-weight:700}
+.tag{display:inline-block;margin-right:5px;padding:0 7px;border:2px solid var(--ink);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.5px}
+.tag.k{background:var(--ink);color:var(--paper)}
+.m{font-size:12px;font-weight:500;opacity:.75}
+.amt{font-family:'Dela Gothic One',sans-serif;font-size:17px;white-space:nowrap}
+.amt.out{color:var(--red)}
+input,button{font:inherit;font-weight:700;padding:12px;border:3px solid var(--ink);background:#fff;color:var(--ink);border-radius:0}
+button{background:var(--ink);color:var(--paper);cursor:pointer}
+button:active{transform:translate(2px,2px)}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
 `;
 
 export default function RootLayout({ children }) {
@@ -40,7 +48,7 @@ export default function RootLayout({ children }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet" />
         <style>{css}</style>
       </head>
       <body>{children}</body>
