@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { db, rp, wib, summary } from '@/lib/db';
+import { db, wib, summary } from '@/lib/db';
 import { token } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
@@ -8,7 +8,11 @@ const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt
 const ICON = { makan: '🍜', transport: '🛵', tagihan: '🧾', belanja: '🛍️', hiburan: '🎮', pemasukan: '💰', tabungan: '🐷', pindah: '🔁', lainnya: '📦' };
 const COLS = ['var(--r)', 'var(--b)', 'var(--pu)', 'var(--p)', 'var(--g)'];
 const SIGN = { income: '+', expense: '-', saving_in: '→🐷', saving_out: '🐷→', transfer: '⇄' };
-const short = (n) => (n >= 1e6 ? (n / 1e6).toFixed(1).replace('.0', '') + 'jt' : Math.round(n / 1e3) + 'rb');
+const rp = (n) => {
+  const t = (v) => String(+v.toFixed(2)).replace('.', ',');
+  const a = Math.abs(n), sg = n < 0 ? '-' : '';
+  return sg + 'Rp' + (a >= 1e6 ? t(a / 1e6) + 'jt' : a >= 1e3 ? t(a / 1e3) + 'rb' : String(a));
+};
 
 export default async function Home() {
   if (cookies().get('fb')?.value !== token()) redirect('/login');
@@ -52,7 +56,7 @@ export default async function Home() {
         <div className="wrap">
           <div className="logo">CATATAN <mark>UANG</mark></div>
           <div className="links"><a href="#ringkasan">Ringkasan</a><a href="#dompet">Dompet</a><a href="#bulan">Bulan Ini</a><a href="#riwayat">Riwayat</a></div>
-          <div className="chip">{short(s.balance)}</div>
+          <div className="chip">{rp(s.balance)}</div>
         </div>
       </nav>
 
@@ -67,7 +71,7 @@ export default async function Home() {
 
       <section id="dompet"><div className="wrap">
         <span className="sticker s-p">DOMPET</span>
-        <div className="row">
+        <div className="row dompet">
           <div className="card tile" style={{ background: 'var(--y)' }}><div className="ic">💵</div><small>Cash</small><div className="n">{rp(s.cash)}</div></div>
           <div className="card tile" style={{ background: 'var(--b)', color: '#fff' }}><div className="ic">🏦</div><small>Bank</small><div className="n">{rp(s.bank)}</div></div>
           <div className="card tile" style={{ background: 'var(--p)', color: '#fff' }}><div className="ic">🐷</div><small>Tabungan</small><div className="n">{rp(s.saving)}</div></div>
@@ -106,7 +110,7 @@ export default async function Home() {
         {rows.length === 0 && <div className="card m">Kirim pesan ke bot, misalnya: beli bakso 20k</div>}
         {groups.map((g) => (
           <div key={g.k}>
-            <div className="day"><span>{label(g.k)}</span><span className="neg">{(() => { const e = g.items.filter((r) => r.type === 'expense').reduce((a, r) => a + r.amount, 0); return e ? '- ' + rp(e) : ''; })()}</span></div>
+            <div className="day"><span>{label(g.k)}</span>{(() => { const e = g.items.filter((r) => r.type === 'expense').reduce((a, r) => a + r.amount, 0); return e ? <span className="neg">- {rp(e)}</span> : null; })()}</div>
             {g.items.map((r) => (
               <div className="card tx" key={r.id}>
                 <div className="ic" style={{ background: r.type === 'expense' ? 'var(--y)' : r.type === 'income' ? 'var(--g)' : 'var(--p)' }}>{ICON[r.category] || '📦'}</div>
