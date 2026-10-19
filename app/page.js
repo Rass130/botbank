@@ -2,12 +2,13 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { db, wib, summary } from '@/lib/db';
 import { token } from '@/lib/auth';
+import { jatah } from '@/lib/plan';
 
 export const dynamic = 'force-dynamic';
 const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-const ICON = { makan: '🍜', transport: '🛵', tagihan: '🧾', belanja: '🛍️', hiburan: '🎮', pemasukan: '💰', tabungan: '🐷', pindah: '🔁', lainnya: '📦' };
+const ICON = { makan: '🍜', transport: '🛵', tagihan: '🧾', belanja: '🛍️', hiburan: '🎮', pemasukan: '💰', tabungan: '🐷', pindah: '🔁', target: '🎯', lainnya: '📦' };
 const COLS = ['var(--r)', 'var(--b)', 'var(--pu)', 'var(--p)', 'var(--g)'];
-const SIGN = { income: '+', expense: '-', saving_in: '→🐷', saving_out: '🐷→', transfer: '⇄' };
+const SIGN = { income: '+', expense: '-', saving_in: '→🐷', saving_out: '🐷→', transfer: '⇄', target_in: '→🎯' };
 const rp = (n) => {
   const t = (v) => String(+v.toFixed(2)).replace('.', ',');
   const a = Math.abs(n), sg = n < 0 ? '-' : '';
@@ -18,6 +19,9 @@ export default async function Home() {
   if (cookies().get('fb')?.value !== token()) redirect('/login');
 
   const s = await summary();
+  const j = await jatah();
+  const { data: tgs } = await db.from('targets').select('*').in('status', ['active', 'done']).order('id');
+  const targets = tgs || [];
   const { data } = await db.from('transactions').select('*').order('id', { ascending: false }).limit(300);
   const rows = data || [];
   const day = (ms = 0) => wib(Date.now() - ms).slice(0, 10);
@@ -55,7 +59,7 @@ export default async function Home() {
       <nav>
         <div className="wrap">
           <div className="logo">CATATAN <mark>UANG</mark></div>
-          <div className="links"><a href="#ringkasan">Ringkasan</a><a href="#dompet">Dompet</a><a href="#bulan">Bulan Ini</a><a href="#riwayat">Riwayat</a></div>
+          <div className="links"><a href="#ringkasan">Ringkasan</a><a href="#dompet">Dompet</a><a href="#target">Target</a><a href="#bulan">Bulan Ini</a><a href="#riwayat">Riwayat</a></div>
           <div className="chip">{rp(s.balance)}</div>
         </div>
       </nav>
@@ -64,7 +68,7 @@ export default async function Home() {
         <span className="sticker s-g">SALDO</span>
         <div className="hero">
           <div className="card"><small>Total semua dompet</small><div className={'big' + (s.balance < 0 ? ' neg' : '')}>{rp(s.balance)}</div></div>
-          <div className="card" style={{ background: 'var(--y)' }}><small>Boleh jajan / hari</small><div className="n">{rp(daily)}</div><div className="m">sisa {left} hari bulan ini</div></div>
+          {j.budget > 0 ? (<div className="card" style={{ background: 'var(--y)' }}><small>Sisa jatah jajan minggu ini</small><div className={'n' + (j.budget - j.spent < 0 ? ' neg' : '')}>{rp(j.budget - j.spent)}</div><div className="m">dari {rp(j.budget)}</div></div>) : (<div className="card" style={{ background: 'var(--y)' }}><small>Boleh jajan / hari</small><div className="n">{rp(daily)}</div><div className="m">sisa {left} hari bulan ini</div></div>)}
         </div>
         {low && <div className="alert">GAWAT! Saldo tinggal tipis. Hemat dulu sampai ada pemasukan lagi.</div>}
       </div></section>
@@ -76,6 +80,21 @@ export default async function Home() {
           <div className="card tile" style={{ background: 'var(--b)', color: '#fff' }}><div className="ic">🏦</div><small>Bank</small><div className="n">{rp(s.bank)}</div></div>
           <div className="card tile" style={{ background: 'var(--p)', color: '#fff' }}><div className="ic">🐷</div><small>Tabungan</small><div className="n">{rp(s.saving)}</div></div>
         </div>
+      </div></section>
+
+      <section id="target"><div className="wrap">
+        <span className="sticker s-g">TARGET</span>
+        {targets.length === 0 && <div className="card m">Belum ada target. Kirim ke bot: target sepatu 500k</div>}
+        {targets.map((t) => {
+          const pct = Math.min(100, Math.round((t.saved / t.price) * 100));
+          return (
+            <div className="card" key={t.id} style={{ marginBottom: 18 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}><b>🎯 {t.name}</b><b>{pct}%</b></div>
+              <div className="prog"><i style={{ width: pct + '%' }} /></div>
+              <div className="m">{rp(t.saved)} / {rp(t.price)}{t.status === 'done' ? ' · TERCAPAI 🎉' : ''}{t.link && <> · <a href={t.link}>link</a></>}</div>
+            </div>
+          );
+        })}
       </div></section>
 
       <section id="bulan" className="y"><div className="wrap">

@@ -51,6 +51,7 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--k)}
 .day span:nth-child(2){background:#fff;border:3px solid var(--k);padding:1px 10px;box-shadow:3px 3px 0 var(--k);font-weight:900}
 .dompet{grid-template-columns:repeat(3,1fr)}
 @media(max-width:700px){nav{position:static}nav .wrap{flex-wrap:wrap;height:auto;padding-top:12px;padding-bottom:10px;gap:10px}.logo{font-size:18px}.chip{margin-left:auto}.links{order:3;flex:none;width:100%;gap:18px;padding-bottom:2px}section{padding:34px 0 42px}.dompet{grid-template-columns:1fr 1fr}.dompet .tile:last-child{grid-column:1/-1}}
+.prog{height:24px;border:3px solid var(--k);background:#fff;margin:10px 0 6px}.prog i{display:block;height:100%;background:var(--p);border-right:3px solid var(--k)}
 `;
 
 export default function RootLayout({ children }) {
